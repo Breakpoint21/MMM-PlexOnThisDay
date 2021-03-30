@@ -1,0 +1,11 @@
+{
+  "name": "MMM-PlexOnThisDay",
+  "version": "1.0.0",
+  "description": "Todo: Insert description here!",
+  "main": "MMM-PlexOnThisDay.js",
+  "author": "Pascal Schumann",
+  "license": "MIT",
+  "dependencies": {
+    "plex-api": "^5.2.3"
+  }
+}
