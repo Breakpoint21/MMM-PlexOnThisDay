@@ -17,6 +17,12 @@ Module.register("MMM-PlexOnThisDay", {
 		slideshowSpeed: 10 * 1000,
 		years: 10,
 		showImageInfo: false,
+		// the sizing of the background image
+		// cover: Resize the background image to cover the entire container, even if it has to stretch the image or cut a little bit off one of the edges
+		// contain: Resize the background image to make sure the image is fully visible
+		backgroundSize: 'cover', // cover or contain
+		// if backgroundSize contain, determine where to zoom the picture. Towards top, center or bottom
+		backgroundPosition: 'center', // Most useful options: "top" or "center" or "bottom"
 		height: "300px",
 		width: "300px",
 		// location of the info div
@@ -51,7 +57,16 @@ Module.register("MMM-PlexOnThisDay", {
 		  "PLEX_ON_THIS_DAY_LOAD_IMAGES",
 		  this.config
 		);
-	  },
+	},
+
+	getHeader: function () {
+		if (this.imageIndex >= this.images.length) {
+			return null;
+		}
+		let image = this.images[this.imageIndex];
+
+		return image.year ? `Heute vor {image.year}` : "Bilder";
+	},
 
 
 
@@ -158,8 +173,6 @@ console.log("image on load");
 
 			const imageDiv = this.createDiv();
 			imageDiv.style.backgroundImage = `url("${i.src}")`;
-			imageDiv.style.width = "200px";
-			imageDiv.style.height = "300px";
 			imageDiv.style.backgroundSize = "contain";
 			  
 			if (!this.browserSupportsExifOrientationNatively) {
@@ -168,8 +181,11 @@ console.log("image on load");
 
 			transitionDiv.appendChild(imageDiv);
 			this.imagesDiv.appendChild(transitionDiv);
+
+			this.updateDom(this);
 		};
 		i.orientation = image.orientation;
+		i.year = image.year;
 		i.src = encodeURI(image.url);
 	},
 

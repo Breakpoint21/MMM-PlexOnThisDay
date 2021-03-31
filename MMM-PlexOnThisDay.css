@@ -8,3 +8,48 @@
  * Custom here your css module
  *
  */
+.MMM-PlexOnThisDay .images,
+.MMM-PlexOnThisDay .image,
+.MMM-PlexOnThisDay .transition,
+.MMM-PlexOnThisDay .gradient {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+.MMM-PlexOnThisDay .image {
+  background-repeat: no-repeat;
+  animation-timing-function: linear;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+}
+.MMM-PlexOnThisDay .transition {
+  animation-timing-function: ease-out;
+}
+
+.MMM-PlexOnThisDay .bottomLeft {
+  bottom: 0pt;
+  left: 0pt;
+  border-width: 1pt 1pt 0 0;
+  border-top-right-radius: 20pt;
+}
+
+.MMM-PlexOnThisDay .bottomRight {
+  bottom: 0pt;
+  right: 0pt;
+  border-width: 1pt 0 0 1pt;
+  border-top-left-radius: 20pt;
+}
+
+.MMM-PlexOnThisDay .topRight {
+  top: 0pt;
+  right: 0pt;
+  border-width: 0 0 1pt 1pt;
+  border-bottom-left-radius: 20pt;
+}
+
+.MMM-PlexOnThisDay .topLeft {
+  top: 0pt;
+  left: 0pt;
+  border-width: 0 1pt 1pt 0;
+  border-bottom-right-radius: 20pt;
+}
