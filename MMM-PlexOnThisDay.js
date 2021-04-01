@@ -100,6 +100,9 @@ Module.register("MMM-PlexOnThisDay", {
 		// create element wrapper for show into the module
 		var wrapper = document.createElement("div");
 
+		wrapper.style.width = self.config.width;
+		wrapper.style.height = self.config.height;
+
 		self.imagesDiv = document.createElement('div');
 		self.imagesDiv.className = 'images';
 		self.imagesDiv.style.width = self.config.width;
