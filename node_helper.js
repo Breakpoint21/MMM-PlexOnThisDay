@@ -120,8 +120,8 @@ module.exports = NodeHelper.create({
 	  },
 
 	getRequestUrl: function(librarySectionKey, year) {
-		var start = moment("2020-12-07").startOf('day').subtract(year, 'years').unix();
-		var end = moment("2020-12-07").endOf('day').subtract(year, 'years').unix();
+		var start = moment().startOf('day').subtract(year, 'years').unix();
+		var end = moment().endOf('day').subtract(year, 'years').unix();
 		return `/library/sections/${librarySectionKey}/all?type=13&originallyAvailableAt>=${start}&originallyAvailableAt<=${end}`;
 	}
 });

@@ -118,8 +118,8 @@ Module.register("MMM-PlexOnThisDay", {
 				
 				if (!this.browserSupportsExifOrientationNatively) {
 					imageDiv.style.transform = this.getImageTransformCss(i.orientation);
+					// when image will be rotated, then height and width need to be swapped
 					if(i.orientation == 6 || i.orientation === 8) {
-						console.log("switched");
 						self.imagesDiv.style.width = self.config.height;
 						self.imagesDiv.style.height = self.config.width;
 						self.imagesDiv.style.marginTop = "40px";
