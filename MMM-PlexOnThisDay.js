@@ -158,7 +158,7 @@ Module.register("MMM-PlexOnThisDay", {
 		//FIXME: This can be load a one file javascript definition
 		return {
 			en: "translations/en.json",
-			es: "translations/es.json"
+			es: "translations/de.json"
 		};
 	},
 
