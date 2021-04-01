@@ -1,4 +1,4 @@
 {
-  "TITLE": "Title",
-  "UPDATE": "Update"
+  "header_one_year": "a year ago today",
+  "header_serverl_years": "{years} years ago today"
 }

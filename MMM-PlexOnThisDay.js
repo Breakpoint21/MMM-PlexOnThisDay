@@ -16,7 +16,6 @@ Module.register("MMM-PlexOnThisDay", {
 		  },
 		slideshowSpeed: 10 * 1000,
 		years: 10,
-		showImageInfo: false,
 		// the sizing of the background image
 		// cover: Resize the background image to cover the entire container, even if it has to stretch the image or cut a little bit off one of the edges
 		// contain: Resize the background image to make sure the image is fully visible
@@ -24,9 +23,7 @@ Module.register("MMM-PlexOnThisDay", {
 		// if backgroundSize contain, determine where to zoom the picture. Towards top, center or bottom
 		backgroundPosition: 'center', // Most useful options: "top" or "center" or "bottom"
 		height: "300px",
-		width: "300px",
-		// location of the info div
-		imageInfoLocation: 'bottomRight', // Other possibilities are: bottomLeft, topLeft, topRight
+		width: "100%",
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -42,12 +39,36 @@ Module.register("MMM-PlexOnThisDay", {
 		if (this.config.plex.hostname.length == 0) {
 			this.errorMessage = "MMM-PlexSlideshow: Missing required parameter.";
 		  } else {
+			this.browserSupportsExifOrientationNatively = CSS.supports(
+				'image-orientation: from-image'
+			);
 			// create an empty image list
 			this.images = [];
 			// set beginning image index to 0, as it will auto increment on start
 			this.imageIndex = 0;
 			this.sendLoadImagesNotification();
+			setInterval(function() {
+				self.updateDom();
+				self.advanceCurrentImage();
+			}, this.config.slideshowSpeed);
 		  }
+	},
+
+	advanceCurrentImage: function () {
+		var self = this;
+		if (self.images.length > 0) {
+			self.imageIndex += 1;
+			if(self.imageIndex >= self.images.length) {
+				sendLoadImagesNotification();
+			}
+		}
+	},
+
+	hasCurrentImage: function () {
+		if (this.images.length === 0 || this.imageIndex >= this.images.length) {
+			return false;
+		}
+		return true;
 	},
 
 	sendLoadImagesNotification: function () {
@@ -60,15 +81,19 @@ Module.register("MMM-PlexOnThisDay", {
 	},
 
 	getHeader: function () {
-		if (this.imageIndex >= this.images.length) {
+		if (!this.hasCurrentImage()) {
 			return null;
 		}
 		let image = this.images[this.imageIndex];
+		var currentYear = new Date().getFullYear();
+		var yearsAgo = currentYear - image.year;
 
-		return image.year ? `Heute vor {image.year}` : "Bilder";
+		if(yearsAgo === 1)
+		{
+			return this.translate("header_one_year");
+		}
+		return this.translate("header_serverl_years", {years: yearsAgo});
 	},
-
-
 
 	getDom: function() {
 		var self = this;
@@ -82,8 +107,31 @@ Module.register("MMM-PlexOnThisDay", {
 		self.imagesDiv.style.height = self.config.height;
     	wrapper.appendChild(self.imagesDiv);
 		
-		if (this.config.showImageInfo) {
-			this.imageInfoDiv = this.createImageInfoDiv(wrapper);
+		if (this.hasCurrentImage()) {
+			let image = this.images[this.imageIndex];
+			//this.imageIndex += 1;
+
+			const i = new Image();
+			i.onload = () => {
+				const imageDiv = this.createDiv();
+				imageDiv.style.backgroundImage = `url("${i.src}")`;
+				imageDiv.style.backgroundSize = "contain";
+				
+				if (!this.browserSupportsExifOrientationNatively) {
+					imageDiv.style.transform = this.getImageTransformCss(i.orientation);
+					if(i.orientation == 6 || i.orientation === 8) {
+						console.log("switched");
+						self.imagesDiv.style.width = self.config.height;
+						self.imagesDiv.style.height = self.config.width;
+						self.imagesDiv.style.marginTop = "40px";
+					}
+				}
+
+				this.imagesDiv.appendChild(imageDiv);
+			};
+			i.orientation = image.orientation;
+			i.year = image.year;
+			i.src = encodeURI(image.url);
 		}
 		return wrapper;
 	},
@@ -93,13 +141,6 @@ Module.register("MMM-PlexOnThisDay", {
 		div.style.backgroundSize = this.config.backgroundSize;
 		div.style.backgroundPosition = this.config.backgroundPosition;
 		div.className = 'image';
-		return div;
-	  },
-
-	createImageInfoDiv: function (wrapper) {
-		const div = document.createElement('div');
-		div.className = 'info ' + this.config.imageInfoLocation;
-		wrapper.appendChild(div);
 		return div;
 	},
 
@@ -122,71 +163,13 @@ Module.register("MMM-PlexOnThisDay", {
 		};
 	},
 
-	processData: function(data) {
-		var self = this;
-		this.dataRequest = data;
-		if (this.loaded === false) { self.updateDom(self.config.animationSpeed) ; }
-		this.loaded = true;
-
-		// the data if load
-		// send notification to helper
-		this.sendSocketNotification("MMM-PlexOnThisDay-NOTIFICATION_TEST", data);
-	},
-
 	// socketNotificationReceived from helper
 	socketNotificationReceived: function (notification, payload) {
 		if(notification === "PLEX_ON_THIS_DAY_LOADED_IMAGES") {
-			// set dataNotification
 			this.images = payload.images;
-			console.log("Images received");
-			console.log(this.images);
-			this.resume();
-		}
-	},
-
-	updateImage: function () {
-		console.log("update image: " + this.imageIndex);
-		console.log("update image: " + this.images.length);
-		if (this.imageIndex >= this.images.length) {
 			this.imageIndex = 0;
-			this.updateImageList();
-			  return;
+			this.updateDom();
 		}
-
-		let image = this.images[this.imageIndex];
-		this.imageIndex += 1;
-
-		const i = new Image();
-		i.onload = () => {
-console.log("image on load");
-
-			// check if there are more than 2 elements and remove the first one
-			if (this.imagesDiv.childNodes.length > 1) {
-				this.imagesDiv.removeChild(this.imagesDiv.childNodes[0]);
-			}
-			if (this.imagesDiv.childNodes.length > 0) {
-				this.imagesDiv.childNodes[0].style.opacity = '0';
-			}
-
-			const transitionDiv = document.createElement('div');
-      		transitionDiv.className = 'transition';
-
-			const imageDiv = this.createDiv();
-			imageDiv.style.backgroundImage = `url("${i.src}")`;
-			imageDiv.style.backgroundSize = "contain";
-			  
-			if (!this.browserSupportsExifOrientationNatively) {
-				imageDiv.style.transform = this.getImageTransformCss(i.orientation);
-			}
-
-			transitionDiv.appendChild(imageDiv);
-			this.imagesDiv.appendChild(transitionDiv);
-
-			this.updateDom(this);
-		};
-		i.orientation = image.orientation;
-		i.year = image.year;
-		i.src = encodeURI(image.url);
 	},
 
 	getImageTransformCss: function (exifOrientation) {
@@ -209,22 +192,5 @@ console.log("image on load");
 		  default:
 			return 'rotate(0deg)';
 		}
-	  },
-
-	suspend: function () {
-		if (this.timer) {
-		  clearInterval(this.timer);
-		  this.timer = null;
-		}
-	  },
-
-	resume: function () {
-		this.suspend(); // clears timer
-		var self = this;
-	
-		this.timer = setInterval(function () {
-		  // console.info('MMM-BackgroundSlideshow updating from resume');
-		  self.updateImage();
-		}, self.config.slideshowSpeed);
 	  },
 });
