@@ -36,20 +36,19 @@ Module.register("MMM-PlexOnThisDay", {
 		//Flag for check if module is loaded
 		this.loaded = false;
 
+		Log.info("Starting module: " + this.name);
 		if (this.config.plex.hostname.length == 0) {
 			this.errorMessage = "MMM-PlexSlideshow: Missing required parameter.";
 		  } else {
 			this.browserSupportsExifOrientationNatively = CSS.supports(
 				'image-orientation: from-image'
 			);
-			// create an empty image list
 			this.images = [];
-			// set beginning image index to 0, as it will auto increment on start
 			this.imageIndex = 0;
 			this.sendLoadImagesNotification();
 			setInterval(function() {
-				self.updateDom();
 				self.advanceCurrentImage();
+				self.updateDom();
 			}, this.config.slideshowSpeed);
 		  }
 	},
@@ -59,7 +58,7 @@ Module.register("MMM-PlexOnThisDay", {
 		if (self.images.length > 0) {
 			self.imageIndex += 1;
 			if(self.imageIndex >= self.images.length) {
-				sendLoadImagesNotification();
+				self.sendLoadImagesNotification();
 			}
 		}
 	},
