@@ -67,14 +67,8 @@ module.exports = NodeHelper.create({
 		return {date: new Date()};
 	},
 
-	getPhotoUrl: function (config, plexPhoto) {
-		return "http://" +
-		config.plex.hostname +
-		":" +
-		config.plex.port +
-		plexPhoto.Media[0].Part[0].key +
-		"?X-Plex-Token=" +
-		api.authToken;
+	getPhotoUrl: function (plexPhoto) {
+		return `http://${api.hostname}:${api.port}${plexPhoto.Media[0].Part[0].key}?X-Plex-Token=${api.authToken}`;
 	},
 
 	loadPlexImages: function (config) {
@@ -109,7 +103,7 @@ module.exports = NodeHelper.create({
 						{
 							photosResponse.MediaContainer.Metadata.forEach((photo) => {
 								imageList.push({
-									url: self.getPhotoUrl(config, photo),
+									url: self.getPhotoUrl(photo),
 									orientation: photo.Media[0].Part[0].orientation,
 									year: photo.year
 								});
@@ -128,6 +122,6 @@ module.exports = NodeHelper.create({
 	getRequestUrl: function(librarySectionKey, year) {
 		var start = moment("2020-12-07").startOf('day').subtract(year, 'years').unix();
 		var end = moment("2020-12-07").endOf('day').subtract(year, 'years').unix();
-		return `/library/sections/${librarySectionKey}/all?originallyAvailableAt>=${start}&originallyAvailableAt<=${end}`;
+		return `/library/sections/${librarySectionKey}/all?type=13&originallyAvailableAt>=${start}&originallyAvailableAt<=${end}`;
 	}
 });
