@@ -23,7 +23,7 @@ Module.register("MMM-PlexOnThisDay", {
 		// if backgroundSize contain, determine where to zoom the picture. Towards top, center or bottom
 		backgroundPosition: 'center', // Most useful options: "top" or "center" or "bottom"
 		height: "300px",
-		width: "100%",
+		width: "400px",
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -113,27 +113,15 @@ Module.register("MMM-PlexOnThisDay", {
 			let image = this.images[this.imageIndex];
 			//this.imageIndex += 1;
 
-			const i = new Image();
-			i.onload = () => {
-				const imageDiv = this.createDiv();
-				imageDiv.style.backgroundImage = `url("${i.src}")`;
-				imageDiv.style.backgroundSize = "contain";
-				
-				if (!this.browserSupportsExifOrientationNatively) {
-					imageDiv.style.transform = this.getImageTransformCss(i.orientation);
-					// when image will be rotated, then height and width need to be swapped
-					if(i.orientation == 6 || i.orientation === 8) {
-						self.imagesDiv.style.width = self.config.height;
-						self.imagesDiv.style.height = self.config.width;
-						self.imagesDiv.style.marginTop = "40px";
-					}
-				}
+			const imageDiv = this.createDiv();
+			imageDiv.style.backgroundImage = `url("${encodeURI(image.url)}")`;
+			imageDiv.style.backgroundSize = "contain";
+			
+			if (!this.browserSupportsExifOrientationNatively) {
+				imageDiv.style.transform = this.getImageTransformCss(image.orientation);
+			}
 
-				this.imagesDiv.appendChild(imageDiv);
-			};
-			i.orientation = image.orientation;
-			i.year = image.year;
-			i.src = encodeURI(image.url);
+			this.imagesDiv.appendChild(imageDiv);
 		}
 		return wrapper;
 	},
@@ -185,11 +173,11 @@ Module.register("MMM-PlexOnThisDay", {
 		  case 5:
 			return 'scaleX(-1) rotate(90deg)';
 		  case 6:
-			return 'rotate(90deg)';
+			return 'rotate(90deg) scale(0.75,0.75)'; //scale to match height/width
 		  case 7:
 			return 'scaleX(-1) rotate(-90deg)';
 		  case 8:
-			return 'rotate(-90deg)';
+			return 'rotate(-90deg) scale(0.75,0.75)'; //scale to match height/width
 		  case 1: // Falls through.
 		  default:
 			return 'rotate(0deg)';
