@@ -82,11 +82,14 @@ module.exports = NodeHelper.create({
 						if(photosResponse.MediaContainer.size)
 						{
 							photosResponse.MediaContainer.Metadata.forEach((photo) => {
-								imageList.push({
-									url: self.getPhotoUrl(photo),
-									orientation: photo.Media[0].Part[0].orientation,
-									year: photo.year
-								});
+								var fileType = photo.Media[0].container.toLowerCase();
+								if(config.filetypes.findIndex((f) => fileType === f) > -1) {
+									imageList.push({
+										url: self.getPhotoUrl(photo),
+										orientation: photo.Media[0].Part[0].orientation,
+										year: photo.year
+									});
+								}
 							});
 						}
 						

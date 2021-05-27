@@ -24,6 +24,7 @@ Module.register("MMM-PlexOnThisDay", {
 		backgroundPosition: 'center', // Most useful options: "top" or "center" or "bottom"
 		height: "300px",
 		width: "400px",
+		filetypes: ["jpeg", "jpg", "png", "tiff", "bmp"]
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
